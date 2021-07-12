@@ -51,6 +51,36 @@ public class Helper {
         return false;
     }
     
+    public static boolean chequearUsuarioContraseniaComprador(String usuario, String clave)
+    {       
+        try          
+        {
+            String pathVendedor = "./comprador.txt";
+            String claveCifrada = toHexString(getSHA(clave)).trim();            
+            File file = new File(pathVendedor);   
+            BufferedReader br = new BufferedReader(new FileReader(file)); 
+  
+            String line; 
+            while ((line = br.readLine()) != null)
+            {
+                String[] arrOfLines = line.split(";");
+                if(arrOfLines.length < 6)
+                    return false; //NO se grabo la cantidad correcta de campos
+                String usuarioVerificar = arrOfLines[4].trim();
+                String claveVerificar = arrOfLines[5].trim();
+                if(usuario.trim().equalsIgnoreCase(usuarioVerificar) && claveCifrada.trim().equalsIgnoreCase(claveVerificar))
+                    return true;  //Ya existe grabado ese usuario
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            System.out.println("Error: "+e);
+            return false;
+        }       
+        return false;
+    }
+    
     public static boolean chequearCorreoElectronico(String correo)
     {       
         try          
@@ -81,22 +111,44 @@ public class Helper {
     
     
     public static Comprador chequearComprador(ArrayList<Comprador> listaCompradores,String usuario, String clave)
-    {                               
-        for(Comprador c : listaCompradores)
+    {
+        try
         {
-            if(usuario.trim().equalsIgnoreCase(c.getUsuario()) && clave.trim().equalsIgnoreCase(c.getClave()))
-                return c;
-        }            
+            String claveCifrada = toHexString(getSHA(clave)).trim();
+            
+            if(listaCompradores == null)
+                return null;
+
+            for(Comprador c : listaCompradores)
+            {            
+                if(usuario.trim().equalsIgnoreCase(c.getUsuario()) && claveCifrada.trim().equalsIgnoreCase(c.getClave()))
+                    return c;
+            }            
+            return null;
+        }
+        catch(Exception e)
+        {
+            
+        }
         return null;
     }
     
     public static Vendedor chequearVendedor(ArrayList<Vendedor> listaVendedores,String usuario, String clave)
-    {                               
-        for(Vendedor v : listaVendedores)
+    {
+        try
         {
-            if(usuario.trim().equalsIgnoreCase(v.getUsuario().trim()) && clave.trim().equalsIgnoreCase(v.getClave().trim()))
-                return v;
-        }            
+            String claveCifrada = toHexString(getSHA(clave)).trim();
+            for(Vendedor v : listaVendedores)
+            {
+                if(usuario.trim().equalsIgnoreCase(v.getUsuario().trim()) && claveCifrada.trim().equalsIgnoreCase(v.getClave().trim()))
+                    return v;
+            }            
+            return null;
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
         return null;
     }
     
@@ -204,7 +256,7 @@ public class Helper {
                 String[] arrOfLines = line.split(";");
                 if(arrOfLines.length < 11)
                     return false; //NO se grabo la cantidad correcta de campos
-                String placaVerificar = arrOfLines[0].trim();                
+                String placaVerificar = arrOfLines[1].trim();                
                 if(placa.trim().equalsIgnoreCase(placaVerificar))
                     return true;  //Ya existe grabado la placa
             }
@@ -318,16 +370,48 @@ public class Helper {
                 String correo        = arrOfLines[2];
                 String organizacion  = arrOfLines[3];
                 String usuario       = arrOfLines[4];
-                String clave         = arrOfLines[7];
+                String clave         = arrOfLines[5];
                
                 listaVendedor.add( new Vendedor(nombres,apellidos,correo,organizacion,usuario,clave));                
             }
         }
         catch(Exception e)
         {
+            e.printStackTrace();
             return null;
         }        
         return listaVendedor;        
+    }
+    
+    public static ArrayList<Comprador> getListaCompradores()
+    {        
+        ArrayList<Comprador> listaComprador = new ArrayList<>();        
+        String pathComprador = "./comprador.txt";            
+        try 
+        {
+            File file = new File(pathComprador);   
+            BufferedReader br = new BufferedReader(new FileReader(file)); 
+
+            String line; 
+            while ((line = br.readLine()) != null)
+            {
+                String[] arrOfLines = line.split(";");                                
+                String nombres       = arrOfLines[0];
+                String apellidos     = arrOfLines[1];
+                String correo        = arrOfLines[2];
+                String organizacion  = arrOfLines[3];
+                String usuario       = arrOfLines[4];
+                String clave         = arrOfLines[5];                                
+               
+                listaComprador.add( new Comprador(nombres,apellidos,correo,organizacion,usuario,clave));                
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }        
+        return listaComprador;        
     }
     
     public static void eliminarVehiculoLista(String placa)            
@@ -524,7 +608,7 @@ public class Helper {
                                         String precioHasta)                                                      
     {
         ArrayList<Vehiculo> listaFiltroTipoVehiculo = new ArrayList<>();
-        if(!tipoVehiculo.trim().isEmpty())
+        if(!tipoVehiculo.trim().isEmpty()  && !tipoVehiculo.equalsIgnoreCase("NO"))
         {
             int tipoV = Integer.parseInt(tipoVehiculo);
             for(Vehiculo v : vehiculos)
@@ -623,7 +707,7 @@ public class Helper {
             transport.connect("smtp.gmail.com",usuario,clave); 
             transport.sendMessage(message, message.getAllRecipients()); 
             transport.close(); 
-            System.out.println("Información de alerta enviada exitosamente"); 
+            System.out.println("Información de oferta enviada exitosamente"); 
         }
         catch (MessagingException me) 
         { 

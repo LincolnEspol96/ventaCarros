@@ -1,3 +1,0 @@
-1;123;prt;as;as;1996;12.0;rojo;diesel;oscuros;w;12000.0
-1;GSF988;GW;M4;Combustible;2016;55000.0;vino;super;oscuros;manual;20000.0
-2;qwe;as;we;qw;2015;20000.0;vino;ert;df;324;45000.0

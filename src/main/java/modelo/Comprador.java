@@ -23,6 +23,11 @@ public class Comprador {
         this.clave = clave;
     }
     
+    public Comprador()
+    {
+        
+    }
+    
     public String getNombres()
     {
         return this.nombres;

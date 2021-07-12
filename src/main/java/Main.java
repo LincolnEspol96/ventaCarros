@@ -29,7 +29,7 @@ public class Main
     static String organizacion;
     static String usuario;
     static String clave;   
-    static ArrayList<Vendedor> listaVendedores;
+    static ArrayList<Vendedor> listaVendedores = new ArrayList<>();
 
     //Variables Vehiculo
     static int opcionVehiculo = 1;
@@ -47,7 +47,7 @@ public class Main
     static ArrayList<Vehiculo> listaVehiculos;
 
      //Variables Oferta
-    static ArrayList<Oferta> listaOfertas;        
+    static ArrayList<Oferta> listaOfertas = new ArrayList<>();        
     static int opcionNumOferta;   
        
     
@@ -57,7 +57,8 @@ public class Main
     static double recorridoVehiculoBusqueda;
     static int anioVehiculoBusqueda;
     static double precioVehiculoBusqueda;
-    static ArrayList<Comprador> listaCompradores;            
+    static ArrayList<Comprador> listaCompradores = new ArrayList<>();            
+    static Comprador compradorSeleccionado = new Comprador();
     
     public static void main(String[] args)
     {        
@@ -272,17 +273,8 @@ public class Main
                                 System.out.println("Ingrese una clave: ");
                                 clave =sc.next();
                                 
-                                Comprador comprador = new Comprador(nombres,apellidos,correoElectronico,organizacion,usuario,clave);                                
-
-                                // Verificar si ya existe el correo y usuario
-                                correoYCorreoExistente = Helper.chequearUsuarioContrasenia(correoElectronico,usuario);
-                                if(correoYCorreoExistente)
-                                    System.out.println("El correo y usuario ya fueron registados en el archivo de texto");
-                                else
-                                {
-                                    Helper.guardarComprador(comprador);  
-                                    listaCompradores.add(comprador);
-                                }
+                                Comprador comprador = new Comprador(nombres,apellidos,correoElectronico,organizacion,usuario,clave);                                                               
+                                Helper.guardarComprador(comprador);                                                               
                                 break;
                                 
                             case 2:
@@ -292,18 +284,19 @@ public class Main
                                 System.out.println("Ingrese su clave: ");
                                 clave = sc.next();
                                 
-                                usuarioYClaveExistente = Helper.chequearUsuarioContrasenia(usuario, clave);
+                                usuarioYClaveExistente = Helper.chequearUsuarioContraseniaComprador(usuario, clave);
                                 if(!usuarioYClaveExistente)
                                     System.out.println("El comprador ingresado no esta registrado, no es posible realizar oferta");                                
                                 else
                                 {
-                                    comprador = Helper.chequearComprador(listaCompradores, usuario, clave);
-                                    if(comprador == null)
+                                    listaCompradores = Helper.getListaCompradores();
+                                    compradorSeleccionado = Helper.chequearComprador(listaCompradores, usuario, clave);
+                                    if(compradorSeleccionado == null)
                                         System.out.println("El comprador seleccionado no existe.");                                
                                     else
                                     {
                                         ArrayList<Vehiculo> vehiculos = Helper.getListaVehiculos();
-                                        ofertarPorVehiculo(comprador,vehiculos, sc);
+                                        ofertarPorVehiculo(compradorSeleccionado,vehiculos, sc);
                                     }
                                 }                                
                                 break;
@@ -322,51 +315,66 @@ public class Main
     
     public static void ofertarPorVehiculo(Comprador comprador,ArrayList<Vehiculo> vehiculos,Scanner sc)
     {
-        String tipoVehiculo,rangoRecorrido,rangoAnio,rangoPrecio;                
+        String tipoVehiculo="-",rangoRecorrido,rangoAnio,rangoPrecio;                
         System.out.println("Por favor ingrese uno o varios criterios");
         do
-        {
-            System.out.println("Ingrese el tipo de Vehiculo: ");
+        {            
             System.out.println("1. Auto");
             System.out.println("2. Camioneta");
             System.out.println("3. Motocicleta");                                        
-            tipoVehiculo = sc.nextLine();
-        }
+            System.out.println("Ingrese el tipo de Vehiculo o NO para excluir filtro ");
+            tipoVehiculo = sc.next();
+        }        
         while(!tipoVehiculo.equalsIgnoreCase("1") && 
               !tipoVehiculo.equalsIgnoreCase("2") && 
               !tipoVehiculo.equalsIgnoreCase("3") && 
-              !tipoVehiculo.trim().isEmpty());
+              !tipoVehiculo.equalsIgnoreCase("NO"));
         
         do
         {
-            System.out.println("Rango recorrido (xxxxx-xxxxx)");
-            rangoRecorrido = sc.nextLine();
+            System.out.println("Rango recorrido (xxxxx-xxxxx) o NO para excluir filtro");
+            rangoRecorrido = sc.next();
         }
-        while(!Helper.validarRangoRecorrido(rangoRecorrido) && !rangoRecorrido.trim().isEmpty());        
+        while(!Helper.validarRangoRecorrido(rangoRecorrido) && !rangoRecorrido.equalsIgnoreCase("NO"));        
         String[] recorridoPart = rangoRecorrido.split("-");
-        String recorridoD = recorridoPart[0].trim().isEmpty() ? "" : recorridoPart[0];
-        String recorridoH = recorridoPart[1].trim().isEmpty() ? "" : recorridoPart[1];
+        String recorridoD = "";
+        String recorridoH = "";  
+        if(recorridoPart.length == 2)
+        {
+            recorridoD = recorridoPart[0].trim().isEmpty() ? "" : recorridoPart[0];
+            recorridoH = recorridoPart[1].trim().isEmpty() ? "" : recorridoPart[1];  
+        }        
         
         do
         {
-            System.out.println("Rango año (xxxxx-xxxxx)");
-            rangoAnio = sc.nextLine();
+            System.out.println("Rango año (xxxxx-xxxxx) o NO para excluir filtro");
+            rangoAnio = sc.next();
         }
-        while(!Helper.validarRangoAnio(rangoAnio) && !rangoAnio.trim().isEmpty());        
+        while(!Helper.validarRangoAnio(rangoAnio) && !rangoAnio.equalsIgnoreCase("NO"));        
         String[] anioPart = rangoAnio.split("-");
-        String anioD = anioPart[0].trim().isEmpty() ? "" : anioPart[0];
-        String anioH = anioPart[1].trim().isEmpty() ? "" : anioPart[1];
-        
+        String anioD = "";
+        String anioH = "";
+        if(anioPart.length == 2)
+        {
+            anioD = anioPart[0].trim().isEmpty() ? "" : anioPart[0];
+            anioH = anioPart[1].trim().isEmpty() ? "" : anioPart[1];
+        }
+                
         do
         {
-            System.out.println("Rango Precios (xxxxx-xxxxx)");
-            rangoPrecio = sc.nextLine();
+            System.out.println("Rango Precios (xxxxx-xxxxx) o NO para excluir filtro");
+            rangoPrecio = sc.next();
         }
-        while(!Helper.validarRangoPrecio(rangoAnio) && !rangoPrecio.trim().isEmpty());        
+        while(!Helper.validarRangoPrecio(rangoAnio) && !rangoPrecio.trim().equalsIgnoreCase("NO"));        
         String[] precioPart = rangoPrecio.split("-");
-        String precioD = precioPart[0].trim().isEmpty() ? "" : precioPart[0];
-        String precioH = precioPart[1].trim().isEmpty() ? "" : precioPart[1];
-                        
+        String precioD = "";
+        String precioH = "";
+        if(precioPart.length == 2)
+        {
+            precioD = precioPart[0].trim().isEmpty() ? "" : precioPart[0];
+            precioH = precioPart[1].trim().isEmpty() ? "" : precioPart[1];
+        }
+                                
         ArrayList<Vehiculo> vehiculosFiltrados = Helper.getListaVehiculosFiltrados(
                                                                                     vehiculos,
                                                                                     tipoVehiculo,
@@ -379,8 +387,8 @@ public class Main
         
         System.out.println("Lista de Vehiculos para ofertar");      
                         
-        String format = " %1$-2s %2$-10s %3$-10s %4$-10s %5$-50s %6$-5s %7$-5s %8$-5s\n";
-        System.out.format(format,"Marca","Modelo","Precio","Color","Transmisión","Año","Recorrido");
+        String format = " %1$-5s %2$-5s %3$-10s %4$-10s %5$-5s %6$-10s %7$-10s %8$-10s\n";
+        System.out.format(format,"No.","Marca","Modelo","Precio","Color","Transmisión","Año","Recorrido");
         String vehiculoEscogido;
         do
         {
@@ -400,7 +408,7 @@ public class Main
 
             }       
             System.out.println("Escoger el vehiculo filtrado: "); 
-            vehiculoEscogido = sc.nextLine();                                    
+            vehiculoEscogido = sc.next();                                    
         }
         while(vehiculoEscogido.trim().isEmpty());                        
         int indiceVehiculo = Integer.parseInt(vehiculoEscogido);
@@ -410,7 +418,7 @@ public class Main
         do
         {
             System.out.println("\nIngrese el precio de la Oferta:");
-            precioOferta = sc.nextLine();
+            precioOferta = sc.next();
         }
         while(precioOferta.trim().isEmpty());
         double precioOf = Double.parseDouble(precioOferta);
@@ -443,7 +451,7 @@ public class Main
             {
                 System.out.println("1.- Siguiente Oferta");
                 System.out.println("2.- Aceptar Oferta");
-                opcionOfertaSeleccionada = sc.nextLine();                                        
+                opcionOfertaSeleccionada = sc.next();                                        
             }
             while(!opcionOfertaSeleccionada.equalsIgnoreCase("1") && !opcionOfertaSeleccionada.equalsIgnoreCase("2"));
 
@@ -451,7 +459,7 @@ public class Main
                 i++;
             else
             {
-                ofertaP = ofertas.get(i);                
+                ofertaP = ofertas.get(i - 1);                
                 String placaSeleccionada = ofertaP.getPlaca();                
                 Vehiculo v = Helper.getVehiculoPorPlaca(placaSeleccionada);
                 Helper.eliminarVehiculoLista(placaSeleccionada);
