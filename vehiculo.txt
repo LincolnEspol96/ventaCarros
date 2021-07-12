@@ -1,0 +1,6 @@
+PLACA,MARCA,MODELO,TIPO-MOTOR,ANO,RECORRIDO,COLOR,TIPO-COMBUSTIBLE,VIDRIOS,TRANSMISION,TRACCION,PRECIO
+[gbe-1234, ford, f-150, grande, 2017, 25000, blanca, gasolina, 6, automatica, 4*4, 25000]
+[gby-2356, toyota, yaris, pequeno, 2008, 124000, blanco, gasolina, 6, manual, no aplica, 9000]
+[prc-345, yamaha, rt-456, grande, 2019, 2000, roja, gasolina, no aplica, no aplica, no aplica, 35000]
+[gtr-2309, ford, ranger, mediano, 2017, 120000, blanca, diesel, 6, automatica, trasera, 25000]
+[her-1256, mazda, cx-30, pequeno, 2019, 24000, negro, gasolina, 6, manual, no aplica, 24000]

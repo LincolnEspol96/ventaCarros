@@ -1,0 +1,3 @@
+NOMBRES,APELLIDOS,ORGANIZACION,CORREO,CLAVE
+[hugo andres, medina gomez, bg, hamedina@espol.edu.ec, 114bd151f8fb0c58642d2170da4ae7d7c57977260ac2cc8905306cab6b2acabc]
+[valeria estefania, medina gomez, er, vmedina@espol.edu.ec, e797c0013811a1d1e35ad7edd10fb99986db664b0996c76ed9ae5e0a5151bbf9]
